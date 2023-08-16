@@ -1,0 +1,3 @@
+# AWS Profile Switcher
+
+WIP
