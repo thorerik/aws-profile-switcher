@@ -27,7 +27,7 @@ jobs:
       - name: Build
         run: go build -v ./...
 
-      - name: Run vet & lint
+      - name: Run vet
         run: go vet ./...
 
       - uses: dominikh/staticcheck-action@v1.2.0
