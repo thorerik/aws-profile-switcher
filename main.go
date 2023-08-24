@@ -66,8 +66,10 @@ func printProfile(profile string) {
 		os.Exit(1)
 	}
 
-	// Print the section
-	fmt.Println(section)
+	// Print each key and value
+	for _, key := range section.Keys() {
+		fmt.Println(key.Name() + "=" + key.Value())
+	}
 }
 
 func deleteProfile(profile string) {
