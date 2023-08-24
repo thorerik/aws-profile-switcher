@@ -7,4 +7,4 @@ edition = "2021"
 
 [dependencies]
 dirs = "5.0.1"
-ini = "1.3.0"
+pretty_ini = "0.1.7"
