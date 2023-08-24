@@ -13,16 +13,22 @@ func help() {
 	fmt.Println("  -l list all profiles")
 	fmt.Println("  -p <profile> print profile")
 	fmt.Println("  -d <profile> delete profile")
-	fmt.Println("  -a <profile> add profile")
+	fmt.Println("  -a <profile> <accsess key id> <secret access key> add profile")
 	fmt.Println("  -e <profile> edit profile")
 	fmt.Println("  -h help")
 }
 
-func readCredentialsIni() *ini.File {
+func getPath() string {
 	// Get the home directory path
 	homeDir, _ := os.UserHomeDir()
 
-	path := homeDir + "/.aws/credentials"
+	return homeDir + "/.aws/credentials"
+}
+
+func readCredentialsIni() *ini.File {
+	// Get the path to the credentials file
+	path := getPath()
+
 	// Check if .aws/credentials exists
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		fmt.Println("File does not exist")
@@ -74,28 +80,32 @@ func deleteProfile(profile string) {
 	fmt.Printf("cfg: %v", cfg)
 
 	// Save the file
-	// err := cfg.SaveTo(cfg.Path())
-	// if err != nil {
-	// 	fmt.Printf("Fail to save file: %v", err)
-	// 	os.Exit(1)
-	// }
+	err := cfg.SaveTo(getPath())
+	if err != nil {
+		fmt.Printf("Fail to save file: %v", err)
+		os.Exit(1)
+	}
 }
 
-func addProfile(profile string) {
+func addProfile(profile string, awsAccessKeyID string, awsSecretAccessKey string) {
 	cfg := readCredentialsIni()
 
 	// Add the section
 	cfg.NewSection(profile)
 
+	// add accesskeyid and secret
+	cfg.Section(profile).NewKey("aws_access_key_id", awsAccessKeyID)
+	cfg.Section(profile).NewKey("aws_secret_access_key", awsSecretAccessKey)
+
 	fmt.Println("Added profile: " + profile)
 	fmt.Printf("cfg: %v", cfg)
 
 	// Save the file
-	// err := cfg.SaveTo()
-	// if err != nil {
-	// 	fmt.Printf("Fail to save file: %v", err)
-	// 	os.Exit(1)
-	// }
+	err := cfg.SaveTo(getPath())
+	if err != nil {
+		fmt.Printf("Fail to save file: %v", err)
+		os.Exit(1)
+	}
 }
 
 func editProfile(profile string) {
@@ -107,7 +117,7 @@ func main() {
 	// -l list all profiles
 	// -p <profile> print profile
 	// -d <profile> delete profile
-	// -a <profile> add profile
+	// -a <profile> <accsess key id> <secret access key> add profile
 	// -e <profile> edit profile
 	// -h help
 	if len(os.Args) == 1 {
@@ -132,11 +142,11 @@ func main() {
 			}
 			deleteProfile(os.Args[i+1])
 		case "-a":
-			if len(os.Args) < i+2 {
+			if len(os.Args) < i+4 {
 				help()
 				os.Exit(1)
 			}
-			addProfile(os.Args[i+1])
+			addProfile(os.Args[i+1], os.Args[i+2], os.Args[i+3])
 		case "-e":
 			if len(os.Args) < i+2 {
 				help()
