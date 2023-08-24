@@ -79,7 +79,6 @@ func deleteProfile(profile string) {
 	cfg.DeleteSection(profile)
 
 	fmt.Println("Deleted profile: " + profile)
-	fmt.Printf("cfg: %v", cfg)
 
 	// Save the file
 	err := cfg.SaveTo(getPath())
@@ -100,7 +99,6 @@ func addProfile(profile string, awsAccessKeyID string, awsSecretAccessKey string
 	cfg.Section(profile).NewKey("aws_secret_access_key", awsSecretAccessKey)
 
 	fmt.Println("Added profile: " + profile)
-	fmt.Printf("cfg: %v", cfg)
 
 	// Save the file
 	err := cfg.SaveTo(getPath())
