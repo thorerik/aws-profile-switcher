@@ -28,6 +28,5 @@ jobs:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         goos: ${{ matrix.goos }}
         goarch: ${{ matrix.goarch }}
-        project_path: "./aws-profile-switcher"
         binary_name: "aws-profile-switcher"
         extra_files: LICENSE README.md
