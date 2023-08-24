@@ -14,7 +14,6 @@ func help() {
 	fmt.Println("  -p <profile> print profile")
 	fmt.Println("  -d <profile> delete profile")
 	fmt.Println("  -a <profile> <accsess key id> <secret access key> add profile")
-	fmt.Println("  -e <profile> edit profile")
 	fmt.Println("  -h help")
 }
 
@@ -108,17 +107,12 @@ func addProfile(profile string, awsAccessKeyID string, awsSecretAccessKey string
 	}
 }
 
-func editProfile(profile string) {
-
-}
-
 func main() {
 	// parse switches
 	// -l list all profiles
 	// -p <profile> print profile
 	// -d <profile> delete profile
 	// -a <profile> <accsess key id> <secret access key> add profile
-	// -e <profile> edit profile
 	// -h help
 	if len(os.Args) == 1 {
 		help()
@@ -147,12 +141,6 @@ func main() {
 				os.Exit(1)
 			}
 			addProfile(os.Args[i+1], os.Args[i+2], os.Args[i+3])
-		case "-e":
-			if len(os.Args) < i+2 {
-				help()
-				os.Exit(1)
-			}
-			editProfile(os.Args[i+1])
 		case "-h":
 			help()
 			os.Exit(0)
