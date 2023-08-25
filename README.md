@@ -12,3 +12,9 @@ Options:
   -a <profile> <accsess key id> <secret access key> add profile
   -h help
 ```
+
+## Installation
+
+ 1. Download release from the [Relases](https://github.com/thorerik/aws-profile-switcher/releases) page.
+ 2. Add the contents of [trap.zsh](./zsh/trap.zsh) to your `~/.zshrc` or `~/.zprofile`
+ 3. Start switching profiles
