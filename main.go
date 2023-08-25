@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"syscall"
 
 	"gopkg.in/ini.v1"
 )
@@ -97,7 +98,7 @@ func printProfile(profile string) {
 	// Get the section
 	section, err := cfg.GetSection(profile)
 	if err != nil {
-		fmt.Printf("Fail to get section: %v", err)
+		fmt.Printf("Fail to get section: %v\n", err)
 		os.Exit(1)
 	}
 
@@ -118,7 +119,7 @@ func deleteProfile(profile string) {
 	// Save the file
 	err := cfg.SaveTo(getPath())
 	if err != nil {
-		fmt.Printf("Fail to save file: %v", err)
+		fmt.Printf("Fail to save file: %v\n", err)
 		os.Exit(1)
 	}
 }
@@ -138,7 +139,7 @@ func addProfile(profile string, awsAccessKeyID string, awsSecretAccessKey string
 	// Save the file
 	err := cfg.SaveTo(getPath())
 	if err != nil {
-		fmt.Printf("Fail to save file: %v", err)
+		fmt.Printf("Fail to save file: %v\n", err)
 		os.Exit(1)
 	}
 }
@@ -150,7 +151,7 @@ func setProfile(profile string) {
 	// Get the section
 	_, err := cfg.GetSection(profile)
 	if err != nil {
-		fmt.Printf("Fail to get section: %v", err)
+		fmt.Printf("Fail to get section: %v\n", err)
 		os.Exit(1)
 	}
 
@@ -159,9 +160,46 @@ func setProfile(profile string) {
 	// Save the file
 	err = config.SaveTo(getConfigPath())
 	if err != nil {
-		fmt.Printf("Fail to save file: %v", err)
+		fmt.Printf("Fail to save file: %v\n", err)
 		os.Exit(1)
 	}
+
+	// Set the profile in ~/.aws_profile so it can be sourced by the shell
+	// Get the home directory path
+	homeDir, _ := os.UserHomeDir()
+
+	// Get the path to the managed profile file
+	path := homeDir + "/.aws_profile"
+
+	// Check if .aws_profile exists
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		// Create the file
+		file, err := os.Create(path)
+		if err != nil {
+			fmt.Printf("Fail to create file: %v\n", err)
+			os.Exit(1)
+		}
+		file.Close()
+	}
+
+	contents := []byte("export AWS_PROFILE=" + profile)
+
+	// Write the profile to the file
+	err = os.WriteFile(path, contents, 0644)
+	if err != nil {
+		fmt.Printf("Fail to write to file: %v\n", err)
+		os.Exit(1)
+	}
+
+	// Send USR1 signal to the shell to reload the profile
+	shellPid := os.Getppid()
+	err = syscall.Kill(shellPid, syscall.SIGUSR1)
+	if err != nil {
+		fmt.Printf("Fail to send signal: %v\n", err)
+		os.Exit(1)
+	}
+
+	fmt.Println("Set profile: " + profile)
 }
 
 func main() {
